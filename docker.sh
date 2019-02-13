@@ -1,4 +1,3 @@
 
 #!/bin/bash
-docker build --tag bdhwan/giftistar-khaiii:0.0.4 .
-docker push bdhwan/giftistar-khaiii:0.0.4
+docker build --no-cache --tag bdhwan/giftistar-khaiii:0.0.6 .

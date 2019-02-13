@@ -1,55 +1,19 @@
-FROM pytorch/pytorch:1.0-cuda10.0-cudnn7-runtime 
+FROM bdhwan/khaiii-api-server:0.0.1
 MAINTAINER bdhwan@gmail.com
 
-RUN git clone https://github.com/kakao/khaiii.git
-WORKDIR /workspace/khaiii
 
-RUN pip install cython
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
 
-RUN mkdir build
+#디폴트 셋은 삭제 후 추가한다
+RUN rm -rf /workspace/khaiii/rsc/src/preanal.manual
+ADD preanal/preanal.manual /workspace/khaiii/rsc/src/preanal.manual
+
+#추가파일은 그냥 추가하면된다. 원하는 파일 만들어서 추가하기
+ADD preanal/preanal.manual2 /workspace/khaiii/rsc/src/preanal.manual2
+
 WORKDIR /workspace/khaiii/build
-
-RUN cmake ..
-RUN make all
+# RUN cd /workspace/khaiii/build/
 RUN make resource
 
-
-RUN make package_python
-WORKDIR /workspace/khaiii/build/package_python
-RUN pip install .
-
-
-
-RUN apt-get update -y
-RUN apt-get install -y language-pack-ko
-RUN locale-gen en_US.UTF-8
-RUN update-locale LANG=en_US.UTF-8
-
-ENV PYTHONIOENCODING=utf-8
-
-
-RUN pip install tornado
-RUN pip install requests
-
-
-
-RUN apt-get install sudo 
-RUN sudo apt-get install -y gnupg
-RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-RUN sudo apt-get install -y nodejs
-RUN sudo npm install -g pm2
-RUN sudo pm2 install pm2-logrotate
-RUN pm2 set pm2-logrotate:max_size 100M
-
-
-ADD index.py /home/index.py
-ADD check.sh /home/check.sh
-ADD healthcheck.js /home/healthcheck.js
-ADD process.yml /home/process.yml
 WORKDIR /home
 
-HEALTHCHECK --interval=30s CMD node healthcheck.js
-EXPOSE 8080
-ENTRYPOINT ["/bin/sh", "check.sh"]
+
